@@ -1,0 +1,37 @@
+local Players = game:GetService("Players")
+
+local MAX_LEVEL = 225
+
+local function xpNeeded(level)
+	return math.floor(100 * level ^ 1.3)
+end
+
+local function addXP(player, amount)
+	local stats = player:FindFirstChild("leaderstats")
+	if not stats then return end
+	local level, xp = stats.Level, stats.XP
+
+	if level.Value >= MAX_LEVEL then return end
+	xp.Value += amount
+
+	while level.Value < MAX_LEVEL and xp.Value >= xpNeeded(level.Value) do
+		xp.Value -= xpNeeded(level.Value)
+		level.Value += 1
+	end
+	if level.Value >= MAX_LEVEL then xp.Value = 0 end
+end
+
+Players.PlayerAdded:Connect(function(player)
+	local stats = Instance.new("Folder")
+	stats.Name = "leaderstats"
+	stats.Parent = player
+
+	local level = Instance.new("IntValue")
+	level.Name = "Level"
+	level.Value = 1
+	level.Parent = stats
+
+	local xp = Instance.new("IntValue")
+	xp.Name = "XP"
+	xp.Parent = stats
+end)
